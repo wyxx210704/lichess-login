@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lichess 登录 - 授权成功</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: url('https://picsum.photos/1920/1080') center/cover fixed;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .glass-card {
+            padding: 32px;
+            background: rgba(255, 255, 255, 0);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .glass-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 60px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.25s ease;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .glass-btn:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== 页面专属 ===== */
+        .page-wrap {
+            width: 100%;
+            max-width: 640px;
+        }
+
+        .icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-bottom: 24px;
+        }
+
+        .status {
+            text-align: center;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            word-break: break-all;
+        }
+
+        .status.ok    { color: #b8f5c8; }
+        .status.error { color: #ffb8b8; }
+        .status.info  { color: #cfe6ff; }
+
+        .steps {
+            list-style: none;
+            counter-reset: step;
+            margin-bottom: 24px;
+        }
+
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-left: 36px;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 4px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .glass-btn.primary {
+            background: rgba(120, 200, 255, 0.35);
+            border-color: rgba(180, 225, 255, 0.7);
+        }
+
+        .glass-btn.primary:hover {
+            background: rgba(120, 200, 255, 0.5);
+        }
+
+        .glass-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 兜底：手动复制的隐藏区域，用户点"显示"才出现 */
+        .fallback {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .fallback.show { display: block; }
+
+        .fallback textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            color: #fff;
+            font-family: ui-monospace, Consolas, monospace;
+            font-size: 0.8rem;
+            resize: none;
+            word-break: break-all;
+        }
+
+        .fallback textarea:focus { outline: none; border-color: rgba(255, 255, 255, 0.6); }
+
+        .fallback .tip {
+            font-size: 0.78rem;
+            opacity: 0.75;
+            margin-top: 6px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrap">
+        <div class="glass-card">
+            <div class="icon">🔐</div>
+            <h1>授权成功</h1>
+            <p class="subtitle">你的 token 已准备好，请按下面步骤操作</p>
+
+            <div class="status info" id="status">正在换取 token...</div>
+
+            <ol class="steps">
+                <li>token 已自动尝试复制到剪贴板</li>
+                <li>切回程序，在 token 输入框内 <b>Ctrl+V</b> 粘贴</li>
+                <li>如果没粘贴出内容，点下面的"再复制一次"</li>
+            </ol>
+
+            <div class="btn-row">
+                <button class="glass-btn primary" id="btn-copy" disabled>再复制一次</button>
+                <button class="glass-btn" id="btn-show" disabled>显示 token（兜底）</button>
+            </div>
+
+            <div class="fallback" id="fallback">
+                <textarea id="token-area" readonly></textarea>
+                <p class="tip">如果连上面的按钮都复制不了，请手动全选这段文字并复制</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 必须和 index.html 一致 =====
+        const CLIENT_ID = "your-unique-client-id";
+        const REDIRECT_URI = "https://你的用户名.github.io/lichess-login/callback.html";
+
+        const statusEl  = document.getElementById('status');
+        const copyBtn   = document.getElementById('btn-copy');
+        const showBtn   = document.getElementById('btn-show');
+        const fallback  = document.getElementById('fallback');
+        const tokenArea = document.getElementById('token-area');
+
+        let accessToken = null;
+
+        function setStatus(text, cls = 'info') {
+            statusEl.textContent = text;
+            statusEl.className = `status ${cls}`;
+        }
+
+        async function exchangeToken() {
+            const params   = new URLSearchParams(window.location.search);
+            const code     = params.get('code');
+            const error    = params.get('error');
+            const verifier = sessionStorage.getItem('code_verifier');
+
+            if (error) {
+                setStatus(`Lichess 返回错误：${error}`, 'error');
+                return;
+            }
+            if (!code) {
+                setStatus('URL 中没有 code，可能授权被取消', 'error');
+                return;
+            }
+            if (!verifier) {
+                setStatus('找不到 code_verifier，可能换了标签页或清了 sessionStorage，请重新登录', 'error');
+                return;
+            }
+
+            const body = new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                code_verifier: verifier,
+                redirect_uri: REDIRECT_URI,
+                client_id: CLIENT_ID,
+            });
+
+            try {
+                const resp = await fetch('https://lichess.org/api/token', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: body.toString(),
+                });
+
+                if (!resp.ok) {
+                    const text = await resp.text();
+                    setStatus(`换 token 失败（${resp.status}）：${text}`, 'error');
+                    return;
+                }
+
+                const data = await resp.json();
+                accessToken = data.access_token;
+
+                // 用完即清
+                sessionStorage.removeItem('code_verifier');
+
+                // 启用按钮
+                copyBtn.disabled = false;
+                showBtn.disabled = false;
+                tokenArea.value = accessToken;
+
+                // 自动尝试复制
+                await tryCopy(true);
+
+            } catch (e) {
+                setStatus(`请求出错：${e}`, 'error');
+            }
+        }
+
+        async function tryCopy(isAuto = false) {
+            if (!accessToken) return;
+
+            // 剪贴板 API 需要 HTTPS 或 localhost，且最好有用户手势
+            try {
+                await navigator.clipboard.writeText(accessToken);
+                setStatus(
+                    isAuto
+                        ? '✅ token 已复制到剪贴板，请切回程序 Ctrl+V 粘贴'
+                        : '✅ 已再次复制到剪贴板',
+                    'ok'
+                );
+            } catch (e) {
+                // 自动复制失败：给用户手势机会
+                setStatus('⚠️ 自动复制失败，请点"再复制一次"或使用下方的兜底方式', 'error');
+                if (!isAuto) {
+                    // 用户手动点了还失败，直接展开兜底
+                    fallback.classList.add('show');
+                }
+            }
+        }
+
+        copyBtn.addEventListener('click', () => tryCopy(false));
+
+        showBtn.addEventListener('click', () => {
+            fallback.classList.toggle('show');
+            if (fallback.classList.contains('show')) {
+                tokenArea.focus();
+                tokenArea.select();
+            }
+        });
+
+        // 进入页面即开始换 token
+        exchangeToken();
+    </script>
+</body>
+</html>

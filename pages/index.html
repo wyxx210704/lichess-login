@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lichess 登录 - 选择权限</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: url('https://picsum.photos/1920/1080') center/cover fixed;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .glass-card {
+            padding: 32px;
+            background: rgba(255, 255, 255, 0);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .glass-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 60px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.25s ease;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .glass-btn:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== 页面专属 ===== */
+        .page-wrap {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .scope-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 720px) {
+            .scope-grid { grid-template-columns: 1fr; }
+        }
+
+        .scope-group {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+        }
+
+        .scope-group h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .scope-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .scope-group label:hover { opacity: 0.85; }
+
+        .scope-group .code {
+            font-family: ui-monospace, "SF Mono", Consolas, monospace;
+            font-size: 0.78rem;
+            opacity: 0.65;
+            margin-left: 4px;
+        }
+
+        /* 自定义复选框 */
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            border: 1.5px solid rgba(255, 255, 255, 0.45);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        input[type="checkbox"]:hover {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        input[type="checkbox"]:checked {
+            background: rgba(120, 200, 255, 0.55);
+            border-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 12px rgba(120, 200, 255, 0.5);
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .footer-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-bar .hint {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .footer-bar .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .glass-btn.primary {
+            background: rgba(120, 200, 255, 0.35);
+            border-color: rgba(180, 225, 255, 0.7);
+        }
+
+        .glass-btn.primary:hover {
+            background: rgba(120, 200, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrap">
+        <div class="glass-card header">
+            <h1>选择要授予的权限</h1>
+            <p>勾选你希望程序使用的功能，未勾选的权限将不会被授予。</p>
+        </div>
+
+        <div class="glass-card">
+            <div class="scope-grid">
+
+                <!-- ===== 用户账户 ===== -->
+                <div class="scope-group">
+                    <h2>用户账户</h2>
+                    <label><input type="checkbox" value="email:read"><span>读取邮箱地址<span class="code">email:read</span></span></label>
+                    <label><input type="checkbox" value="preference:read"><span>读取偏好设置<span class="code">preference:read</span></span></label>
+                    <label><input type="checkbox" value="preference:write"><span>写入偏好设置<span class="code">preference:write</span></span></label>
+                </div>
+
+                <!-- ===== 互动 ===== -->
+                <div class="scope-group">
+                    <h2>互动</h2>
+                    <label><input type="checkbox" value="follow:read"><span>读取已关注的棋手<span class="code">follow:read</span></span></label>
+                    <label><input type="checkbox" value="follow:write"><span>关注和取消关注其他棋手<span class="code">follow:write</span></span></label>
+                    <label><input type="checkbox" value="msg:write"><span>向其他棋手发送私信<span class="code">msg:write</span></span></label>
+                    <label><input type="checkbox" value="note:write"><span>查看和撰写其他棋手的备注<span class="code">note:write</span></span></label>
+                </div>
+
+                <!-- ===== 对弈 ===== -->
+                <div class="scope-group">
+                    <h2>对弈</h2>
+                    <label><input type="checkbox" value="challenge:read"><span>读取收到的挑战<span class="code">challenge:read</span></span></label>
+                    <label><input type="checkbox" value="challenge:write"><span>发送、接受和拒绝挑战<span class="code">challenge:write</span></span></label>
+                    <label><input type="checkbox" value="challenge:bulk"><span>为其他棋手批量创建对局<span class="code">challenge:bulk</span></span></label>
+                </div>
+
+                <!-- ===== 团队 ===== -->
+                <div class="scope-group">
+                    <h2>团队</h2>
+                    <label><input type="checkbox" value="team:read"><span>读取私人团队信息<span class="code">team:read</span></span></label>
+                    <label><input type="checkbox" value="team:write"><span>加入和离开团队<span class="code">team:write</span></span></label>
+                    <label><input type="checkbox" value="team:lead"><span>管理您所带领的团队：发送私信、移除成员<span class="code">team:lead</span></span></label>
+                </div>
+
+                <!-- ===== 谜题 ===== -->
+                <div class="scope-group">
+                    <h2>谜题</h2>
+                    <label><input type="checkbox" value="puzzle:read"><span>读取谜题活动记录<span class="code">puzzle:read</span></span></label>
+                    <label><input type="checkbox" value="puzzle:write"><span>解答谜题<span class="code">puzzle:write</span></span></label>
+                    <label><input type="checkbox" value="racer:write"><span>创建和加入谜题赛事<span class="code">racer:write</span></span></label>
+                </div>
+
+                <!-- ===== 锦标赛 ===== -->
+                <div class="scope-group">
+                    <h2>锦标赛</h2>
+                    <label><input type="checkbox" value="tournament:read"><span>查看私人锦标赛<span class="code">tournament:read</span></span></label>
+                    <label><input type="checkbox" value="tournament:write"><span>创建、更新和加入锦标赛<span class="code">tournament:write</span></span></label>
+                </div>
+
+                <!-- ===== 研习与转播 ===== -->
+                <div class="scope-group">
+                    <h2>研习与转播</h2>
+                    <label><input type="checkbox" value="study:read"><span>读取私人研习与直播<span class="code">study:read</span></span></label>
+                    <label><input type="checkbox" value="study:write"><span>创建、更新、删除研习与直播<span class="code">study:write</span></span></label>
+                </div>
+
+                <!-- ===== 外部对弈 ===== -->
+                <div class="scope-group">
+                    <h2>外部对弈</h2>
+                    <label><input type="checkbox" value="board:play"><span>使用棋盘 API 进行对局<span class="code">board:play</span></span></label>
+                    <label><input type="checkbox" value="bot:play"><span>使用机器人 API 进行对局<span class="code">bot:play</span></span></label>
+                </div>
+
+                <!-- ===== 外部引擎 ===== -->
+                <div class="scope-group">
+                    <h2>外部引擎</h2>
+                    <label><input type="checkbox" value="engine:read"><span>查看和使用您的外部引擎<span class="code">engine:read</span></span></label>
+                    <label><input type="checkbox" value="engine:write"><span>创建和更新外部引擎<span class="code">engine:write</span></span></label>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="glass-card footer-bar">
+            <span class="hint" id="selected-hint">已选择 0 项权限</span>
+            <div class="btn-group">
+                <button class="glass-btn" id="btn-select-all">全选</button>
+                <button class="glass-btn" id="btn-clear">清空</button>
+                <button class="glass-btn primary" id="btn-login">确定，去 Lichess 授权</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 必须和 Lichess 请求授权码时一致 =====
+        const CLIENT_ID = "your-unique-client-id";
+        const REDIRECT_URI = "https://你的用户名.github.io/lichess-login/callback.html";
+
+        const checkboxes = () => Array.from(document.querySelectorAll('input[type=checkbox]'));
+
+        function updateHint() {
+            const n = checkboxes().filter(cb => cb.checked).length;
+            document.getElementById('selected-hint').textContent = `已选择 ${n} 项权限`;
+        }
+
+        checkboxes().forEach(cb => cb.addEventListener('change', updateHint));
+
+        document.getElementById('btn-select-all').addEventListener('click', () => {
+            checkboxes().forEach(cb => cb.checked = true);
+            updateHint();
+        });
+
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            checkboxes().forEach(cb => cb.checked = false);
+            updateHint();
+        });
+
+        // ===== PKCE 工具 =====
+        function generateVerifier(length = 128) {
+            const array = new Uint8Array(length);
+            crypto.getRandomValues(array);
+            return Array.from(array, b => b.toString(16).padStart(2, '0')).join('').slice(0, length);
+        }
+
+        async function generateChallenge(verifier) {
+            const data = new TextEncoder().encode(verifier);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            return btoa(String.fromCharCode(...new Uint8Array(digest)))
+                .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+
+        document.getElementById('btn-login').addEventListener('click', async () => {
+            const scopes = checkboxes()
+                .filter(cb => cb.checked)
+                .map(cb => cb.value)
+                .join(' ');
+
+            if (!scopes) {
+                alert('请至少勾选一项权限');
+                return;
+            }
+
+            const verifier = generateVerifier();
+            const challenge = await generateChallenge(verifier);
+
+            // 存起来，callback 页要用
+            sessionStorage.setItem('code_verifier', verifier);
+            // 顺便存 scope，callback 页可以显示
+            sessionStorage.setItem('scopes', scopes);
+
+            const params = new URLSearchParams({
+                response_type: 'code',
+                client_id: CLIENT_ID,
+                redirect_uri: REDIRECT_URI,
+                code_challenge: challenge,
+                code_challenge_method: 'S256',
+                scope: scopes,
+            });
+
+            window.location.href = `https://lichess.org/oauth?${params.toString()}`;
+        });
+
+        updateHint();
+    </script>
+</body>
+</html>
